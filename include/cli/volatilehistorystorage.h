@@ -1,6 +1,6 @@
 /*******************************************************************************
  * CLI - A simple command line interface.
- * Copyright (C) 2016 Daniele Pallastrelli
+ * Copyright (C) 2020 Daniele Pallastrelli
  *
  * Boost Software License - Version 1.0 - August 17th, 2003
  *
@@ -27,50 +27,38 @@
  * DEALINGS IN THE SOFTWARE.
  ******************************************************************************/
 
-#ifndef CLI_COLORPROFILE_H_
-#define CLI_COLORPROFILE_H_
+#ifndef CLI_VOLATILEHISTORYSTORAGE_H_
+#define CLI_VOLATILEHISTORYSTORAGE_H_
 
-#include "detail/rang.h"
+#include "historystorage.h"
+#include <deque>
 
 namespace cli
 {
 
-inline bool& Color() { static bool color; return color; }
-
-inline void SetColor() { Color() = true; }
-inline void SetNoColor() { Color() = false; }
-
-enum BeforePrompt { beforePrompt };
-enum AfterPrompt { afterPrompt };
-enum BeforeInput { beforeInput };
-enum AfterInput { afterInput };
-
-inline std::ostream& operator<<(std::ostream& os, BeforePrompt)
+class VolatileHistoryStorage : public HistoryStorage
 {
-    if ( Color() ) { os << rang::control::forceColor << rang::fg::green << rang::style::bold; }
-    return os;
-}
-
-inline std::ostream& operator<<(std::ostream& os, AfterPrompt)
-{
-    os << rang::style::reset;
-    return os;
-}
-
-inline std::ostream& operator<<(std::ostream& os, BeforeInput)
-{
-    if ( Color() ) { os << rang::control::forceColor << rang::fgB::gray; }
-    return os;
-}
-
-inline std::ostream& operator<<(std::ostream& os, AfterInput)
-{
-    os << rang::style::reset;
-    return os;
-}
+    public:
+        explicit VolatileHistoryStorage(std::size_t size = 1000) : maxSize(size) {}
+        void Store(const std::vector<std::string>& cmds) override
+        {
+            commands.insert(commands.end(), cmds.begin(), cmds.end());
+            if (commands.size() > maxSize)
+                commands.erase(commands.begin(), commands.begin()+commands.size()-maxSize);
+        }
+        std::vector<std::string> Commands() const override
+        {
+            return std::vector<std::string>(commands.begin(), commands.end());
+        }
+        void Clear() override
+        {
+            commands.clear();
+        }
+    private:
+        const std::size_t maxSize;
+        std::deque<std::string> commands;
+};
 
 } // namespace cli
 
-#endif // CLI_COLORPROFILE_H_
-
-
+#endif // CLI_VOLATILEHISTORYSTORAGE_H_

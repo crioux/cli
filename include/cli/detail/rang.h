@@ -12,12 +12,15 @@
 #endif
 
 #if defined(OS_LINUX) || defined(OS_MAC)
-#include <unistd.h>
-#include <cstring>
+    #include <unistd.h>
+    #include <cstring>
 #elif defined(OS_WIN)
-#include <windows.h>
-#include <io.h>
-#include <VersionHelpers.h>
+    #if !defined(NOMINMAX)
+        #define NOMINMAX 1
+    #endif // !defined(NOMINMAX)
+    #include <windows.h>
+    #include <io.h>
+    #include <VersionHelpers.h>
 #endif
 
 #include <algorithm>

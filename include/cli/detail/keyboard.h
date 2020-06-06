@@ -27,8 +27,8 @@
  * DEALINGS IN THE SOFTWARE.
  ******************************************************************************/
 
-#ifndef CLI_KEYBOARD_H_
-#define CLI_KEYBOARD_H_
+#ifndef CLI_DETAIL_KEYBOARD_H_
+#define CLI_DETAIL_KEYBOARD_H_
 
 #if defined(__unix__) || defined(__unix) || defined(__linux__)
     #define OS_LINUX
@@ -42,10 +42,10 @@
 
 #if defined(OS_LINUX) || defined(OS_MAC)
     #include "linuxkeyboard.h"
-    namespace cli { using Keyboard = LinuxKeyboard; }
+    namespace cli { namespace detail { using Keyboard = detail::LinuxKeyboard; } }
 #elif defined(OS_WIN)
     #include "winkeyboard.h"
-    namespace cli { using Keyboard = WinKeyboard; }
+    namespace cli { namespace detail { using Keyboard = detail::WinKeyboard; } }
 #else
     #error "Platform not supported (yet)."
 #endif
@@ -54,5 +54,5 @@
 #undef OS_WIN
 #undef OS_MAC
 
-#endif // CLI_KEYBOARD_H_
+#endif // CLI_DETAIL_KEYBOARD_H_
 
